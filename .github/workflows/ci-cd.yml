@@ -1,30 +1,33 @@
-
-name: 'build and deploy react app'
+name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: 
+    branches:
       - main
+
+permissions:
+  contents: write
+  pages: write
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Login to GitHub Container Registry (GHCR)
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Use Node.js 20
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+          cache: 'npm'
 
-      - name: Build Docker Image
-        run: docker build -t ghcr.io/${{ github.actor }}/${{ github.event.repository.name }}:latest .
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Verify React Build Output
-        run: |
-          CONTAINER_ID=$(docker create ghcr.io/${{ github.actor }}/${{ github.event.repository.name }}:latest)
-          docker cp $CONTAINER_ID:/usr/share/nginx/html ./dist
-          docker rm -v $CONTAINER_ID
-          ls -la ./dist
+      - name: Build
+        run: npm run build
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
