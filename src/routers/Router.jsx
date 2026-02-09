@@ -8,20 +8,23 @@ import Register from "../pages/Register";
 import PostDetail from "../pages/PostDetail";
 import Author from "../pages/Author";
 
-const router = createHashRouter([
-  {
-    path: "/",
-    element: <Layout />,
-    children: [
-      { path: "", element: <Home /> },
-      { path: "edit/:id", element: <Edit /> },
-      { path: "create", element: <Create /> },
-      { path: "login", element: <Login /> },
-      { path: "register", element: <Register /> },
-      { path: "post/:id", element: <PostDetail /> },
-      { path: "author/:id", element: <Author /> },
-    ],
-  },
-]);
+const router = createHashRouter(
+  [
+    {
+      path: "/",
+      element: <Layout />,
+      children: [
+        { path: "", element: <Home /> },
+        { path: "edit/:id", element: <Edit /> },
+        { path: "create", element: <Create /> },
+        { path: "login", element: <Login /> },
+        { path: "register", element: <Register /> },
+        { path: "post/:id", element: <PostDetail /> },
+        { path: "author/:id", element: <Author /> },
+      ],
+    },
+  ],
+  { basename: "/blog-mern-frontend-exam" },
+);
 
 export default router;
