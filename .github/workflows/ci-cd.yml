@@ -1,0 +1,33 @@
+
+name: 'build and deploy react app'
+
+on:
+  push:
+    branches: 
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry (GHCR)
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build Docker Image
+        run: docker build -t ghcr.io/${{ github.actor }}/${{ github.event.repository.name }}:latest .
+
+      - name: Verify React Build Output
+        run: |
+          CONTAINER_ID=$(docker create ghcr.io/${{ github.actor }}/${{ github.event.repository.name }}:latest)
+          docker cp $CONTAINER_ID:/usr/share/nginx/html ./dist
+          docker rm -v $CONTAINER_ID
+          ls -la ./dist
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: dist
